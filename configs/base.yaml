@@ -1,0 +1,5 @@
+seed: 42
+data:
+  kaggle_handle: meowmeowmeowmeowmeow/gtsrb-german-traffic-sign
+  raw_dir: data/raw/gtsrb
+  train_csv: Train.csv

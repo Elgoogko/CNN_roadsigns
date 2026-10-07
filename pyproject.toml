@@ -1,12 +1,18 @@
 [project]
 name = "cnn-roadsigns"
 version = "0.1.0"
+description = "CNN roadsigns"
+readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.11"
 dependencies = [
+    "ipykernel>=7.4.0",
     "kagglehub>=1.0.2",
     "matplotlib>=3.11.2",
     "nbstripout>=0.9.1",
+    "numpy>=2.4.6",
     "opencv-python-headless>=5.0.0.93",
+    "pandas>=3.0.6",
     "pillow>=12.3.0",
     "pre-commit>=4.6.2",
     "pytest>=9.1.1",
@@ -16,6 +22,16 @@ dependencies = [
     "seaborn>=0.13.2",
     "tensorboard>=2.21.0",
     "tensorflow>=2.21.0",
+    "torch>=2.14.1",
+    "torchvision>=0.29.1",
     "tqdm>=4.70.1",
     "ultralytics>=8.4.172",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Configuration spécifique pour la structure "src" avec Hatchling
+[tool.hatch.build.targets.wheel]
+packages = ["src/trafficsigns"]
