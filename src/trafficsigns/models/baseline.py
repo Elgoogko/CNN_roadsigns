@@ -2,10 +2,16 @@ import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Input
 
-def build_baseline_model(input_shape, num_classes):
+def build_baseline_model(input_shape: tuple[int, int, int], num_classes: int) -> tf.keras.Model:
     """
     Construit un modèle de référence (Dense/MLP) pour la classification multiclasse.
-    Architecture : Image -> Flatten -> Dense (ReLU) -> Dense (Softmax)
+
+    Args:
+        input_shape (tuple[int, int, int]): Les dimensions des images en entrée (ex: (32, 32, 3)).
+        num_classes (int): Le nombre total de catégories de panneaux (ex: 43 pour GTSRB).
+        
+    Returns:
+        tf.keras.Model: Le modèle Keras compilé, prêt pour l'entraînement.
     """
     model = Sequential([
         Input(shape=input_shape),
