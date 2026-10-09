@@ -1,14 +1,15 @@
-import os
 from pathlib import Path
 import numpy as np
 import pytest
-from src.trafficsigns.training.train import train_model
+from trafficsigns.training.train import train_model
 
 def test_train_model_execution(tmp_path):
-    """Teste que le script d'entraînement s'exécute avec la structure de fichiers de Bari."""
+    """Teste que le script d'entraînement s'exécute avec les fonctions de Bari."""
     
     dummy_x_full = np.random.randint(0, 256, (4, 48, 48, 3), dtype=np.uint8)
     dummy_y_full = np.array([0, 1, 0, 1])
+    
+    dummy_paths = np.array(["0/img1.png", "1/img2.png", "0/img3.png", "1/img4.png"])
     
     dummy_train_idx = np.array([0, 1])
     dummy_val_idx = np.array([2, 3])
@@ -18,6 +19,7 @@ def test_train_model_execution(tmp_path):
     
     np.save(data_dir / "img_mats.npy", dummy_x_full)
     np.save(data_dir / "labels.npy", dummy_y_full)
+    np.save(data_dir / "paths.npy", dummy_paths) # <-- Ajout ici
     np.savez(data_dir / "split.npz", train_idx=dummy_train_idx, val_idx=dummy_val_idx)
     
     dummy_model_path = tmp_path / "dummy_model.keras"
