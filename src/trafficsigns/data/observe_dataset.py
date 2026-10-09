@@ -83,7 +83,7 @@ def get_size_of_images_plot(df: pd.DataFrame) -> None:
     # - c=df['ClassId'] : colore par classe pour repérer d'éventuels groupes
     # – s=25 : taille des points modérée
     # – cmap='tab20' : palette contrastée pour différencier les classes
-    scatter = ax.scatter(
+    ax.scatter(
         df['Height'],
         df['Width'],
         c=df['ClassId'],
