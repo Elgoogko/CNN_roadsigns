@@ -14,3 +14,6 @@ dataset:
 
 input_data:
   processed_dir : data/processed/output_images.npz
+
+split:
+  val_ratio: 0.2
