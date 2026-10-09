@@ -9,11 +9,16 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from trafficsigns.config import load_config
+
+ROOT = Path(__file__).resolve().parents[3]
+
+cfg = load_config(ROOT / "configs" / "base.yaml")
 
 # Valeurs de Fallback
-IMG_SIZE = (48, 48)
-NUM_CLASSES = 43
-IMG_EXTENSIONS = {".png"}
+IMG_SIZE = cfg["image"]["size"]
+NUM_CLASSES = int(cfg["dataset"]["num_classes"])
+IMG_EXTENSIONS = cfg["dataset"]["extensions"]
 
 
 def load_image(img_path: str | Path) -> np.ndarray:
@@ -168,7 +173,7 @@ def load_dataset(input_dir: str | Path, mmap: bool = False):
 def to_one_hot(y: np.ndarray, num_classes: int = NUM_CLASSES) -> np.ndarray:
     """
 
-    Transforme les entiers spécifiant les classes en one hot encodeing. Entiers (N,) -> one-hot (N, num_classes).
+    Transforme les entiers spécifiant les classes en one hot encoding. Entiers (N,) -> one-hot (N, num_classes).
     :param y: Vecteurs des classes (N,1)
     :param num_classes: nombre de classes du dataset
     :return: matrice one hot encoding de taille (N, num_classes)
@@ -186,8 +191,6 @@ def from_one_hot(y_one_hot: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    root = Path(__file__).resolve().parents[3]
 
-    config = load_dataset(root / "configs" / "base.yaml")
-    X, y, paths = build_dataset(root / "data" / "raw" / "gtsrb" / "Train")
-    save_dataset(X, y, paths, root / "data" / "processed" / "train")
+    X, y, paths = build_dataset(ROOT / "data" / "raw" / "gtsrb" / "Train")
+    save_dataset(X, y, paths, ROOT / "data" / "processed" / "train")

@@ -11,6 +11,7 @@ image:
 dataset:
   num_classes: 43
   batch_size: 32
+  extensions: [".png"]
 
 input_data:
   processed_dir : data/processed/output_images.npz
