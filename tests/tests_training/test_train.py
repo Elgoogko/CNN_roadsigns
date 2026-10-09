@@ -1,29 +1,32 @@
 import os
+from pathlib import Path
 import numpy as np
 import pytest
-from src.trafficsigns.training.train import train_model
+from trafficsigns.training.train import train_model
 
 def test_train_model_execution(tmp_path):
-    """Teste que le script d'entraînement s'exécute de bout en bout sans erreur."""
+    """Teste que le script d'entraînement s'exécute de la manière attendue."""
     
-    dummy_x_train = np.random.rand(2, 32, 32, 3).astype(np.float32)
-    dummy_y_train = np.array([0, 1])
-    dummy_x_val = np.random.rand(2, 32, 32, 3).astype(np.float32)
-    dummy_y_val = np.array([1, 0])
+    dummy_x_full = np.random.randint(0, 256, (4, 48, 48, 3), dtype=np.uint8)
+    dummy_y_full = np.array([0, 1, 0, 1])
     
+    dummy_paths = np.array(["0/img1.png", "1/img2.png", "0/img3.png", "1/img4.png"])
+    
+    dummy_train_idx = np.array([0, 1])
+    dummy_val_idx = np.array([2, 3])
 
-    dummy_data_path = tmp_path / "dummy_dataset.npz"
+    data_dir = tmp_path / "train_data"
+    data_dir.mkdir()
+    
+    np.save(data_dir / "img_mats.npy", dummy_x_full)
+    np.save(data_dir / "labels.npy", dummy_y_full)
+    np.save(data_dir / "paths.npy", dummy_paths) # <-- Ajout ici
+    np.savez(data_dir / "split.npz", train_idx=dummy_train_idx, val_idx=dummy_val_idx)
+    
     dummy_model_path = tmp_path / "dummy_model.keras"
     
-    np.savez(
-        dummy_data_path, 
-        X_train=dummy_x_train, y_train=dummy_y_train, 
-        X_val=dummy_x_val, y_val=dummy_y_val
-    )
-    
-    # 1 seule epoch et batch_size=2 pour que le test soit rapide
     history = train_model(
-        data_path=str(dummy_data_path),
+        data_dir=str(data_dir),
         model_save_path=str(dummy_model_path),
         epochs=1,
         batch_size=2
