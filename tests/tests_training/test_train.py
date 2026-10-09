@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 import numpy as np
 import pytest
 from trafficsigns.training.train import train_model
 
 def test_train_model_execution(tmp_path):
-    """Teste que le script d'entraînement s'exécute avec les fonctions de Bari."""
+    """Teste que le script d'entraînement s'exécute de la manière attendue."""
     
     dummy_x_full = np.random.randint(0, 256, (4, 48, 48, 3), dtype=np.uint8)
     dummy_y_full = np.array([0, 1, 0, 1])
