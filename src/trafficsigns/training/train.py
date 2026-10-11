@@ -1,10 +1,11 @@
 import os
 import argparse
-from pathlib import Path
-import tensorflow as tf
-from trafficsigns.data.preprocessing import load_dataset, normalize, NUM_CLASSES
-from trafficsigns.data.split import load_split  # Correction de la coquille de Bari (split au lieu de splits)
+from trafficsigns.data.preprocessing import normalize, NUM_CLASSES
 from trafficsigns.models.baseline import build_baseline_model
+from trafficsigns.utils.compute_parameters import get_mean_std
+from trafficsigns.data.dataset import load_dataset, load_split
+from pathlib import Path
+import numpy as np
 
 def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: int):
     """
@@ -15,14 +16,15 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     train_idx, val_idx = load_split(data_dir)
     
     print("--- 2. Prétraitement (Normalisation) ---")
-    X_train, y_train = normalize(X[train_idx]), y[train_idx]
-    X_val, y_val = normalize(X[val_idx]), y[val_idx]
+    mean, std = get_mean_std(data_dir)  # calculées sur le TRAIN uniquement
+    x_train, y_train = normalize(X[train_idx], mean, std), y[train_idx]
+    x_val, y_val = normalize(X[val_idx], mean, std), y[val_idx]  # mêmes stats
 
-    print(f"Images d'entraînement : {X_train.shape}")
-    print(f"Images de validation  : {X_val.shape}")
+    print(f"Images d'entraînement : {x_train.shape}")
+    print(f"Images de validation  : {x_val.shape}")
 
     print("\n--- 3. Construction du modèle ---")
-    input_shape = X_train.shape[1:] 
+    input_shape = x_train.shape[1:]
     num_classes = NUM_CLASSES
     
     model = build_baseline_model(input_shape=input_shape, num_classes=num_classes)
@@ -30,9 +32,9 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
 
     print("\n--- 4. Début de l'entraînement ---")
     history = model.fit(
-        X_train, 
+        x_train,
         y_train,
-        validation_data=(X_val, y_val),
+        validation_data=(x_val, y_val),
         batch_size=batch_size,
         epochs=epochs
     )
@@ -41,6 +43,9 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
     model.save(model_save_path)
     print(f"Modèle sauvegardé avec succès sous : {model_save_path}")
+    save_path = Path(model_save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(save_path.parent / "norm_stats.npz", mean=mean, std=std)  # pour l'inférence
 
     return history
 
