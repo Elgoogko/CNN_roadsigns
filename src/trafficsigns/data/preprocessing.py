@@ -91,7 +91,7 @@ def load_and_resize(img_path: str | Path, size: tuple[int, int] = IMG_SIZE) -> n
     Chemin -> tableau uint8 (H, L, 3) redimensionné. Sert à construire le cache.
     :param img_path: Chemin vers une image
     :param size: largeur, hauteur attendue de l'image
-    :return image chargée en mémoire et re dimensioné à la taille size
+    :return image chargée en mémoire et redimensionner à la taille size
     """
     return resize_img(load_image(img_path), size)
 
@@ -144,7 +144,7 @@ def build_dataset(raw_dir: str | Path, size: tuple[int, int] = IMG_SIZE):
 
 def save_dataset(x: np.ndarray, y:np.ndarray, paths:np.ndarray, output_dir: str | Path) -> None:
     """
-    Sauvegarde le cache en .npy (non compressé, relisible avec mmap_mode).
+    Sauvegarde le cache en .npy (non compressé, lisible avec mmap_mode).
     :param x: Images du dataset transformé en tableau
     :param y: Label des images transformé en One-hot-encoding (tableau de taille (43, N))
     :param paths: chemins uniques de toutes les images associés à leur index dans X
@@ -156,18 +156,7 @@ def save_dataset(x: np.ndarray, y:np.ndarray, paths:np.ndarray, output_dir: str 
     np.save(output_dir / "img_mats.npy", x)
     np.save(output_dir / "labels.npy", y)
     np.save(output_dir / "paths.npy", paths)
-    print(f"Sauvegardé dans '{output_dir}' : X {x.shape} {x.dtype}, y {y.shape}")
-
-
-def load_dataset(input_dir: str | Path, mmap: bool = False):
-    """
-    Recharge (X, y, paths). mmap=True évite de charger X entièrement en RAM.
-    :param input_dir: Répertoire ou sont stockées les tableaux
-    :param mmap: divise le tableau numpy pour éviter de surchargé la mémoire
-    """
-    input_dir = Path(input_dir)
-    X = np.load(input_dir / "img_mats.npy", mmap_mode="r" if mmap else None)
-    return X, np.load(input_dir / "labels.npy"), np.load(input_dir / "paths.npy")
+    print(f"Sauvegardé dans '{output_dir}' : X {x.shape} {x.dtype.__str__()}, y {y.shape}")
 
 
 def to_one_hot(y: np.ndarray, num_classes: int = NUM_CLASSES) -> np.ndarray:
@@ -189,8 +178,6 @@ def from_one_hot(y_one_hot: np.ndarray) -> np.ndarray:
     """
     return np.argmax(y_one_hot, axis=-1)
 
-
 if __name__ == "__main__":
-
-    X, y, paths = build_dataset(ROOT / "data" / "raw" / "gtsrb" / "Train")
-    save_dataset(X, y, paths, ROOT / "data" / "processed" / "train")
+    img_X, img_y, img_paths = build_dataset(ROOT / "data" / "raw" / "gtsrb" / "Train")
+    save_dataset(img_X, img_y, img_paths, ROOT / "data" / "processed" / "train")

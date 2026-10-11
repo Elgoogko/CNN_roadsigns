@@ -7,6 +7,8 @@ from typing import Any
 
 import yaml
 
+
+ROOT = Path(__file__).resolve().parents[2]
 Config = dict[str, Any]
 
 def _deep_merge(base: Config, override: Config) -> Config:

@@ -109,16 +109,6 @@ def save_split(train_idx: np.ndarray, val_idx: np.ndarray, output_dir: str | Pat
              seed=seed, val_ratio=val_ratio)
 
 
-def load_split(input_dir: str | Path) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Charge le split créer précédement pour l'utiliser dans le réseau
-    :param input_dir: dossier où se trouvent les fichiers séparés
-    :return: le tableau des images de train et validation
-    """
-    data = np.load(Path(input_dir) / "split.npz")
-    return data["train_idx"], data["val_idx"]
-
-
 if __name__ == "__main__":
     from trafficsigns.config import load_config
     from trafficsigns.data.preprocessing import load_dataset

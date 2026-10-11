@@ -365,6 +365,8 @@ source = { editable = "." }
 dependencies = [
     { name = "ipykernel" },
     { name = "kagglehub" },
+    { name = "keras" },
+    { name = "keras-nightly" },
     { name = "matplotlib" },
     { name = "nbstripout" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -391,6 +393,8 @@ dependencies = [
 requires-dist = [
     { name = "ipykernel", specifier = ">=7.4.0" },
     { name = "kagglehub", specifier = ">=1.0.2" },
+    { name = "keras", specifier = ">=3.15.1" },
+    { name = "keras-nightly", specifier = ">=3.16.0.dev2026101004" },
     { name = "matplotlib", specifier = ">=3.11.2" },
     { name = "nbstripout", specifier = ">=0.9.1" },
     { name = "numpy", specifier = ">=2.4.6" },
@@ -1219,6 +1223,26 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ec/a6/4cebb4196f4e6284b35e68dc17dda9a4111a2e2bf21db8211de12881ef89/keras-3.15.1.tar.gz", hash = "sha256:92ae7c1dd7f61041953dc2d42253181ee099086f0b58ae36fcf98147a6f08a29", size = 1919818, upload-time = "2026-07-29T18:20:13.909Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8d/b3/c9b848bbdba18e765a8051917c0cc82585b64278ce87895f2e521a27438f/keras-3.15.1-py3-none-any.whl", hash = "sha256:836460e480930acbd19bb7a17e62f9ecad40e8a9af9a651fc8d0586a96d27e20", size = 2398595, upload-time = "2026-07-29T18:20:12.345Z" },
+]
+
+[[package]]
+name = "keras-nightly"
+version = "3.16.0.dev2026101004"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "h5py" },
+    { name = "ml-dtypes" },
+    { name = "namex" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "optree" },
+    { name = "packaging" },
+    { name = "rich" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/6a/b3fc0cfd09fa9b0dbd40bb5560852fbb9e72bcc793eb3f5dc37b41d2fac2/keras_nightly-3.16.0.dev2026101004.tar.gz", hash = "sha256:f1d63df38b15a2392ca0f40f3220c6a44e42de57ed85cbc0eb84e1a92dbe18f2", size = 1307416, upload-time = "2026-10-10T04:15:35.011Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/67/1d/123d0b6324c6c6db5b9cbd53efe61a279535925c7727c315e0c8bccdb664/keras_nightly-3.16.0.dev2026101004-py3-none-any.whl", hash = "sha256:90bda356f482397459007a653da6cdb696d382818a67878d7017d8c7053fc5fc", size = 1689543, upload-time = "2026-10-10T04:15:31.845Z" },
 ]
 
 [[package]]
