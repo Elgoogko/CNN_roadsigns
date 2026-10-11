@@ -7,14 +7,14 @@
 #   from google.colab import userdata
 #   os.environ["GITHUB_TOKEN"] = userdata.get("GITHUB_TOKEN")  # repo privé uniquement
 #   !bash <(curl -fsSL -H "Authorization: token $GITHUB_TOKEN" \
-#       https://raw.githubusercontent.com/<USER>/<REPO>/main/scripts/setup_colab.sh)
+#       https://raw.githubusercontent.com/Elgoogko/CNN_roadsigns/main/scripts/setup_colab.sh)
 # ou, si le repo est déjà cloné :
 #   !bash scripts/setup_colab.sh
 
 set -euo pipefail
 
 # ---- Configuration (à adapter) ----
-REPO_URL="${REPO_URL:-https://github.com/<USER>/traffic-sign-recognition.git}"
+REPO_URL="${REPO_URL:-https://github.com/Elgoogko/CNN_roadsigns.git}"
 BRANCH="${BRANCH:-main}"
 TARGET_DIR="${TARGET_DIR:-/content/traffic-sign-recognition}"
 

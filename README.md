@@ -187,6 +187,181 @@ uv run pre-commit install
 
 ---
 
+## Run on Google Colab
+ 
+### 1. Prerequisites
+ 
+- A Google account (Colab + Drive).
+- A GitHub account with access to the `Elgoogko/CNN_roadsigns` repository.
+- A Kaggle account (if the dataset is downloaded from Kaggle).
+- All code changes **pushed to GitHub** (`git push`): Colab clones GitHub, not your local machine.
+---
+ 
+### 2. One-time Setup (to do only once)
+ 
+#### 2.1 Colab Secrets
+ 
+In Colab, open the left sidebar, key icon 🔑 (**Secrets**), then add:
+ 
+| Secret | When | Content |
+|---|---|---|
+| `GITHUB_TOKEN` | **Private** repository only | GitHub token with read access to the repository |
+| `KAGGLE_USERNAME` | Download via Kaggle | Kaggle username |
+| `KAGGLE_KEY` | Download via Kaggle | Kaggle API key |
+ 
+For each secret, **enable the "Notebook access" toggle**. Otherwise reading the secret will fail.
+ 
+> ⚠️ Never write a token or a key in the notebook, in the code, or in Git.
+ 
+#### 2.2 Drive Folder
+ 
+Create the following directory structure in Google Drive:
+ 
+```
+MyDrive/
+└── traffic_signs/
+    ├── cache/      # preprocessed data (.npy)
+    ├── models/     # model weights (.keras)
+    ├── logs/       # training logs (CSV, TensorBoard)
+    └── figures/    # curves, confusion matrices
+```
+ 
+#### 2.3 Colab Configuration File
+ 
+Output paths are **not** modified in `configs/base.yaml`. A `configs/colab.yaml` file only overrides paths to point to the Drive folder above (`/content/drive/MyDrive/traffic_signs/...`). The same code thus works both locally and on Colab.
+ 
+---
+ 
+### 3. Starting a Session
+ 
+To be repeated at **each new session**.
+ 
+#### 3.1 Enable GPU
+ 
+Menu **Runtime → Change runtime type → T4 GPU**.
+ 
+To do **before** any installation: changing the runtime clears the session.
+ 
+#### 3.2 Clone the Repository and Install (Cell 1)
+ 
+```python
+import os
+from google.colab import userdata
+ 
+os.environ["GITHUB_TOKEN"] = userdata.get("GITHUB_TOKEN")  # not needed if the repository is public
+ 
+!git clone https://$GITHUB_TOKEN@github.com/Elgoogko/CNN_roadsigns.git /content/traffic-sign-recognition
+%cd /content/traffic-sign-recognition
+!bash scripts/setup_colab.sh
+```
+ 
+The `scripts/setup_colab.sh` script:
+ 
+1. installs `uv` if needed;
+2. installs the project in editable mode (`import trafficsigns` becomes possible);
+3. creates unversioned working directories;
+4. displays versions and GPU detection.
+**Check in the output**: `trafficsigns` is found and `TF GPU : True`. If it is `False`, go back to step 3.1.
+ 
+> If Colab asks to **restart runtime** after installation, accept, then resume at step 3.3 (without re-cloning).
+ 
+#### 3.3 Mount Google Drive (Cell 2)
+ 
+```python
+from google.colab import drive
+drive.mount("/content/drive")
+```
+ 
+---
+ 
+### 4. Data
+ 
+The `data/` folder is not versioned: the cloned repository contains **no images**.
+ 
+#### Principle
+ 
+| Data | Location | Why |
+|---|---|---|
+| Raw images | Local disk `data/raw/` | Fast reading, re-downloadable |
+| Preprocessed cache (`.npy`) | Local `data/processed/` **and copy to Drive** | Avoids redoing preprocessing at each session |
+ 
+> Never read raw images directly from Drive: tens of thousands of small files are very slow to read there.
+ 
+#### First Session
+ 
+1. Download the dataset using the `download.py` module (or `kagglehub`), after exposing Kaggle secrets in `os.environ`.
+   - Alternative: place the dataset zip once on Drive, then copy and extract it locally.
+2. Run preprocessing (`preprocessing.py`): resizing, normalization, `.npy` cache.
+3. **Copy `data/processed/` to `MyDrive/traffic_signs/cache/`.**
+#### Subsequent Sessions
+ 
+Simply copy the cache from Drive to `data/processed/`. Preprocessing does not need to be done again.
+ 
+---
+ 
+### 5. Saving Results to Drive
+ 
+Everything that needs to persist across sessions must be written to Drive:
+ 
+| Item | Destination |
+|---|---|
+| Model weights | `MyDrive/traffic_signs/models/` |
+| Training logs | `MyDrive/traffic_signs/logs/` |
+| Figures | `MyDrive/traffic_signs/figures/` |
+| Preprocessed cache | `MyDrive/traffic_signs/cache/` |
+ 
+Load configuration **with** the `colab.yaml` override so that these paths are used automatically.
+ 
+Reminder: the **test** set is only used for final evaluation, never during training or model selection.
+ 
+---
+ 
+### 8. Resuming After a Disconnection
+ 
+Colab disconnects after a period of inactivity (around 90 minutes) and limits session duration.
+ 
+1. New session: repeat steps **3.1 to 3.3**.
+2. Copy the cache from Drive again (step 4, "Subsequent Sessions").
+3. Reload the latest checkpoint from `MyDrive/traffic_signs/models/`.
+4. Resume training for the remaining epochs.
+---
+ 
+### 9. Retrieving Results and Versioning
+ 
+- **Figures and experiment table**: copy from Drive to repository (`reports/figures/`, `reports/experiments_table.csv`).
+- **Notebook** (Colab does not write to your local Git):
+  - either **File → Save a copy in GitHub**;
+  - or **File → Download .ipynb**, then commit from your computer (`nbstripout` cleans outputs).
+- **Final model weights**: keep on Drive and locally (they are not versioned in Git).
+---
+ 
+### 10. Troubleshooting
+ 
+| Symptom | Probable Cause | Solution |
+|---|---|---|
+| Secret not found / access denied | "Notebook access" toggle disabled | Enable it in the Secrets panel |
+| `ModuleNotFoundError: trafficsigns` | Incorrect current directory, or installation not re-run after a restart | `%cd /content/traffic-sign-recognition`, then re-run `setup_colab.sh` |
+| `TF GPU : False` | Runtime on CPU | Switch to T4 GPU, then resume from step 3.2 |
+| Installation failure (Python version) | `requires-python` too strict for Colab's version | Use `>=3.11` in `pyproject.toml` |
+| Very long installation | TensorFlow reinstalled by project dependencies | Do not pin TensorFlow in `dependencies`: Colab already has it |
+| Very slow image reading | Reading from Drive | Copy data locally (`/content`) |
+| Insufficient memory (`Resource exhausted`) | Batch size too large | Halve the batch size |
+| Weights lost after session | Written to `/content` instead of Drive | Check the `colab.yaml` override |
+| Authentication error on clone | Token missing, expired, or lacking read permission | Regenerate the token and update the secret |
+ 
+---
+ 
+### Session Routine
+ 
+| # | Action | Estimated Duration |
+|---|---|---|
+| 1 | GPU enabled, secrets in place | 1 min |
+| 2 | Clone + `setup_colab.sh` | 2 to 4 min |
+| 3 | Mount Drive | 30 s |
+| 4 | Copy Drive cache → local | < 1 min |
+| 5 | Load configuration with `colab.yaml` | instant |
+| 6 | Training, checkpoints on Drive | variable |
+---
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
