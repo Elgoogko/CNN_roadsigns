@@ -4,15 +4,17 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from trafficsigns.utils.compute_parameters import get_mean_std
 
 from trafficsigns.data.preprocessing import preprocess_single_image
 
-def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
+def evaluate_model(model_path: str, test_csv_path: str, data_dir: str, base_img_dir: str):
     """
     Évalue un modèle Keras sur le jeu de test complet et affiche les métriques.
     :param model_path: Le chemin vers le fichier du modèle entraîné (ex: '.keras').
     :param test_csv_path: Le chemin vers le fichier CSV de test contenant les annotations 
                           (doit inclure les colonnes 'Path' et 'ClassId').
+    :param data_dir: Le chemin vers le dossier contenant les données d'entraînement.
     :param base_img_dir: Le chemin vers le dossier racine contenant les images de test.
     :return: None. Affiche les métriques dans la console et sauvegarde 
              'confusion_matrix.npy' dans le répertoire courant.
@@ -26,7 +28,7 @@ def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
     image_paths = df['Path'].values
     
     print("--- 3. Prétraitement des images de test ---")
-    x_test = []
+    X_test = []
     
     for img_path in image_paths:
         full_path = Path(base_img_dir) / img_path
@@ -34,15 +36,16 @@ def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
         if not full_path.exists():
             print(f"Image introuvable ignorée : {full_path}")
             continue
-            
-        img_processed = preprocess_single_image(full_path, mean=1.0, std=1.0)
-        x_test.append(img_processed)
+
+        mean, std = get_mean_std(data_dir)
+        img_processed = preprocess_single_image(full_path, mean, std)
+        X_test.append(img_processed)
         
-    x_test = np.array(x_test)
-    print(f"Tenseur de test créé avec succès : {x_test.shape}")
+    X_test = np.array(X_test)
+    print(f"Tenseur de test créé avec succès : {X_test.shape}")
     
     print("\n--- 4. Génération des prédictions ---")
-    y_pred_probs = model.predict(x_test)
+    y_pred_probs = model.predict(X_test)
     y_pred = np.argmax(y_pred_probs, axis=1)
     
     print("\n--- 5. Résultats et Métriques ---")
@@ -63,12 +66,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script d'évaluation du modèle")
     parser.add_argument("--model", type=str, required=True, help="Chemin vers le modèle entraîné (.keras)")
     parser.add_argument("--csv", type=str, default="data/raw/gtsrb/Test.csv", help="Chemin vers le CSV de test")
+    parser.add_argument("--data_dir", type=str, default="data/processed/train", help="Dossier contenant les données d'entraînement pour la normalisation")
     parser.add_argument("--img_dir", type=str, default="data/raw/gtsrb/", help="Dossier racine des images de test")
-    
     args = parser.parse_args()
     
     evaluate_model(
         model_path=args.model,
         test_csv_path=args.csv,
+        data_dir=args.data_dir,
         base_img_dir=args.img_dir
     )
