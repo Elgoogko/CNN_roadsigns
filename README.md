@@ -203,11 +203,11 @@ uv run pre-commit install
  
 In Colab, open the left sidebar, key icon 🔑 (**Secrets**), then add:
  
-| Secret | When | Content |
-|---|---|---|
-| `GITHUB_TOKEN` | **Private** repository only | GitHub token with read access to the repository |
-| `KAGGLE_USERNAME` | Download via Kaggle | Kaggle username |
-| `KAGGLE_KEY` | Download via Kaggle | Kaggle API key |
+| Secret            | When                        | Content                                         |
+|-------------------|-----------------------------|-------------------------------------------------|
+| `GITHUB_TOKEN`    | **Private** repository only | GitHub token with read access to the repository |
+| `KAGGLE_USERNAME` | Download via Kaggle         | Kaggle username                                 |
+| `KAGGLE_KEY`      | Download via Kaggle         | Kaggle API key                                  |
  
 For each secret, **enable the "Notebook access" toggle**. Otherwise reading the secret will fail.
  
@@ -280,9 +280,9 @@ The `data/` folder is not versioned: the cloned repository contains **no images*
  
 #### Principle
  
-| Data | Location | Why |
-|---|---|---|
-| Raw images | Local disk `data/raw/` | Fast reading, re-downloadable |
+| Data                        | Location                                      | Why                                          |
+|-----------------------------|-----------------------------------------------|----------------------------------------------|
+| Raw images                  | Local disk `data/raw/`                        | Fast reading, re-downloadable                |
 | Preprocessed cache (`.npy`) | Local `data/processed/` **and copy to Drive** | Avoids redoing preprocessing at each session |
  
 > Never read raw images directly from Drive: tens of thousands of small files are very slow to read there.
@@ -303,12 +303,12 @@ Simply copy the cache from Drive to `data/processed/`. Preprocessing does not ne
  
 Everything that needs to persist across sessions must be written to Drive:
  
-| Item | Destination |
-|---|---|
-| Model weights | `MyDrive/traffic_signs/models/` |
-| Training logs | `MyDrive/traffic_signs/logs/` |
-| Figures | `MyDrive/traffic_signs/figures/` |
-| Preprocessed cache | `MyDrive/traffic_signs/cache/` |
+| Item               | Destination                      |
+|--------------------|----------------------------------|
+| Model weights      | `MyDrive/traffic_signs/models/`  |
+| Training logs      | `MyDrive/traffic_signs/logs/`    |
+| Figures            | `MyDrive/traffic_signs/figures/` |
+| Preprocessed cache | `MyDrive/traffic_signs/cache/`   |
  
 Load configuration **with** the `colab.yaml` override so that these paths are used automatically.
  
@@ -337,30 +337,30 @@ Colab disconnects after a period of inactivity (around 90 minutes) and limits se
  
 ### 10. Troubleshooting
  
-| Symptom | Probable Cause | Solution |
-|---|---|---|
-| Secret not found / access denied | "Notebook access" toggle disabled | Enable it in the Secrets panel |
-| `ModuleNotFoundError: trafficsigns` | Incorrect current directory, or installation not re-run after a restart | `%cd /content/traffic-sign-recognition`, then re-run `setup_colab.sh` |
-| `TF GPU : False` | Runtime on CPU | Switch to T4 GPU, then resume from step 3.2 |
-| Installation failure (Python version) | `requires-python` too strict for Colab's version | Use `>=3.11` in `pyproject.toml` |
-| Very long installation | TensorFlow reinstalled by project dependencies | Do not pin TensorFlow in `dependencies`: Colab already has it |
-| Very slow image reading | Reading from Drive | Copy data locally (`/content`) |
-| Insufficient memory (`Resource exhausted`) | Batch size too large | Halve the batch size |
-| Weights lost after session | Written to `/content` instead of Drive | Check the `colab.yaml` override |
-| Authentication error on clone | Token missing, expired, or lacking read permission | Regenerate the token and update the secret |
+| Symptom                                    | Probable Cause                                                          | Solution                                                              |
+|--------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------|
+| Secret not found / access denied           | "Notebook access" toggle disabled                                       | Enable it in the Secrets panel                                        |
+| `ModuleNotFoundError: trafficsigns`        | Incorrect current directory, or installation not re-run after a restart | `%cd /content/traffic-sign-recognition`, then re-run `setup_colab.sh` |
+| `TF GPU : False`                           | Runtime on CPU                                                          | Switch to T4 GPU, then resume from step 3.2                           |
+| Installation failure (Python version)      | `requires-python` too strict for Colab's version                        | Use `>=3.11` in `pyproject.toml`                                      |
+| Very long installation                     | TensorFlow reinstalled by project dependencies                          | Do not pin TensorFlow in `dependencies`: Colab already has it         |
+| Very slow image reading                    | Reading from Drive                                                      | Copy data locally (`/content`)                                        |
+| Insufficient memory (`Resource exhausted`) | Batch size too large                                                    | Halve the batch size                                                  |
+| Weights lost after session                 | Written to `/content` instead of Drive                                  | Check the `colab.yaml` override                                       |
+| Authentication error on clone              | Token missing, expired, or lacking read permission                      | Regenerate the token and update the secret                            |
  
 ---
  
 ### Session Routine
  
-| # | Action | Estimated Duration |
-|---|---|---|
-| 1 | GPU enabled, secrets in place | 1 min |
-| 2 | Clone + `setup_colab.sh` | 2 to 4 min |
-| 3 | Mount Drive | 30 s |
-| 4 | Copy Drive cache → local | < 1 min |
-| 5 | Load configuration with `colab.yaml` | instant |
-| 6 | Training, checkpoints on Drive | variable |
+| # | Action                               | Estimated Duration |
+|---|--------------------------------------|--------------------|
+| 1 | GPU enabled, secrets in place        | 1 min              |
+| 2 | Clone + `setup_colab.sh`             | 2 to 4 min         |
+| 3 | Mount Drive                          | 30 s               |
+| 4 | Copy Drive cache → local             | < 1 min            |
+| 5 | Load configuration with `colab.yaml` | instant            |
+| 6 | Training, checkpoints on Drive       | variable           |
 ---
 ## 📄 License
 

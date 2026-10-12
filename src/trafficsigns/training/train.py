@@ -12,13 +12,13 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     Charge les données, normalise, entraîne le modèle et sauvegarde les poids.
     """
     print(f"--- 1. Chargement des données depuis le dossier {data_dir} ---")
-    X, y, _ = load_dataset(data_dir, mmap=True)
+    x, y, _ = load_dataset(data_dir, mmap=True)
     train_idx, val_idx = load_split(data_dir)
     
     print("--- 2. Prétraitement (Normalisation) ---")
     mean, std = get_mean_std(data_dir)  # calculées sur le TRAIN uniquement
-    x_train, y_train = normalize(X[train_idx], mean, std), y[train_idx]
-    x_val, y_val = normalize(X[val_idx], mean, std), y[val_idx]  # mêmes stats
+    x_train, y_train = normalize(x[train_idx], mean, std), y[train_idx]
+    x_val, y_val = normalize(x[val_idx], mean, std), y[val_idx]  # mêmes stats
 
     print(f"Images d'entraînement : {x_train.shape}")
     print(f"Images de validation  : {x_val.shape}")

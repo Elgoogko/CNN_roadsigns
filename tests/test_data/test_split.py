@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from trafficsigns.data import split as sp
-
+from trafficsigns.data import dataset as ds
 
 def make_dataset(tracks_per_class=(4, 6, 10, 7, 20), seed=0):
     """
@@ -135,5 +135,5 @@ def test_save_then_load_roundtrip(data, tmp_path):
     y, _, groups = data
     tr, va = sp.grouped_stratified_split(y, groups, 0.2, seed=42)
     sp.save_split(tr, va, tmp_path / "out", seed=42, val_ratio=0.2)
-    tr2, va2 = sp.load_split(tmp_path / "out")
+    tr2, va2 = ds.load_split(tmp_path / "out")
     assert np.array_equal(tr, tr2) and np.array_equal(va, va2)

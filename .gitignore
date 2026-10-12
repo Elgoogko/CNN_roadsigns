@@ -150,12 +150,6 @@ poetry.toml
 # LSP
 pyrightconfig.json
 
-*.sage.py
-.pdm.toml
-profile_default/
-.nox/
-.spyproject
-
 site/
 
 ### Vscode ###

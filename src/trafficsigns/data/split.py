@@ -111,7 +111,7 @@ def save_split(train_idx: np.ndarray, val_idx: np.ndarray, output_dir: str | Pat
 
 if __name__ == "__main__":
     from trafficsigns.config import load_config
-    from trafficsigns.data.preprocessing import load_dataset
+    from trafficsigns.data.dataset import load_dataset
 
     root = Path(__file__).resolve().parents[3]
     cfg = load_config(root / "configs" / "base.yaml")

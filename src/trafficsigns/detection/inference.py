@@ -47,9 +47,9 @@ class Inference:
 
         predictions = self.predict(input_tensor)
         predicted_class = int(self.apply_argmax(predictions)[0])
-        conf = float(predictions[0, predicted_class])
+        confiance = float(predictions[0, predicted_class])
 
-        return predicted_class, conf
+        return predicted_class, confiance
 
     def predict_multiple(self, img_paths: list[str | Path]) :
         """

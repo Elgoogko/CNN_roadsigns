@@ -35,9 +35,11 @@ def save_mean_std(output_dir: Path|str, mean, std) -> None:
     """
     Sauvegarde la moyenne et la variance sur le dataset d'entrainement
     :param output_dir: fichier de destination
+    :param mean moyenne des canaux
+    :param std variance des canaux
     """
     assert Path(output_dir).exists(), "Le chemin spécifié est introuvable"
-    np.savez(output_dir / "norm_stats", mean=mean, std=std)
+    np.savez(Path.joinpath(Path(output_dir), "norm_stats"), mean=mean, std=std)
 
 def load_mean_std(data_dir : Path | str):
     """

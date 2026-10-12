@@ -13,7 +13,7 @@ def build_baseline_model(input_shape: tuple[int, int, int], num_classes: int) ->
     Returns:
         tf.keras.Model: Le modèle Keras compilé, prêt pour l'entraînement.
     """
-    model = Sequential([
+    new_model = Sequential([
         Input(shape=input_shape),
         
         Flatten(),
@@ -23,13 +23,13 @@ def build_baseline_model(input_shape: tuple[int, int, int], num_classes: int) ->
         Dense(num_classes, activation='softmax')
     ])
     
-    model.compile(
+    new_model.compile(
         optimizer='adam',
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )
     
-    return model
+    return new_model
 
 if __name__ == "__main__":
     # Exemple pour des images de 32x32 pixels en RGB (3 canaux) et K=43 classes (ex: GTSRB)

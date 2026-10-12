@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from trafficsigns.data import preprocessing as pp
+from trafficsigns.data import dataset as ds
 
 NUM_CLASSES = pp.NUM_CLASSES
 
@@ -111,10 +112,10 @@ def test_preprocess_single_image_end_to_end(tmp_path):
 
 # ---------- construction du dataset ----------
 def test_build_dataset_shapes_and_dtypes(raw_dir):
-    X, y, paths = pp.build_dataset(raw_dir)
-    assert X.shape == (2 * NUM_CLASSES, pp.IMG_SIZE[1], pp.IMG_SIZE[0], 3)  # le CSV est ignoré
-    assert X.dtype == np.uint8
-    assert y.shape == (len(X),) and len(paths) == len(X)
+    x, y, paths = pp.build_dataset(raw_dir)
+    assert x.shape == (2 * NUM_CLASSES, pp.IMG_SIZE[1], pp.IMG_SIZE[0], 3)  # le CSV est ignoré
+    assert x.dtype == np.uint8
+    assert y.shape == (len(x),) and len(paths) == len(x)
 
 
 def test_build_dataset_labels_match_class_ids_and_numeric_order(raw_dir):
@@ -123,9 +124,9 @@ def test_build_dataset_labels_match_class_ids_and_numeric_order(raw_dir):
     assert np.all(np.diff(y) >= 0)  # "10" vient après "9", pas après "1"
 
 
-def test_build_dataset_keeps_X_y_aligned(raw_dir):
-    X, y, _ = pp.build_dataset(raw_dir)
-    means = X.reshape(len(X), -1).mean(axis=1)
+def test_build_dataset_keeps_x_y_aligned(raw_dir):
+    x, y, _ = pp.build_dataset(raw_dir)
+    means = x.reshape(len(x), -1).mean(axis=1)
     assert np.allclose(means, y * 5)
 
 
@@ -137,9 +138,9 @@ def test_build_dataset_paths_are_posix_and_consistent_with_labels(raw_dir):
 
 
 def test_build_dataset_is_deterministic(raw_dir):
-    X1, y1, p1 = pp.build_dataset(raw_dir)
-    X2, y2, p2 = pp.build_dataset(raw_dir)
-    assert np.array_equal(X1, X2) and np.array_equal(y1, y2) and np.array_equal(p1, p2)
+    x1, y1, p1 = pp.build_dataset(raw_dir)
+    x2, y2, p2 = pp.build_dataset(raw_dir)
+    assert np.array_equal(x1, x2) and np.array_equal(y1, y2) and np.array_equal(p1, p2)
 
 
 def test_build_dataset_rejects_file_in_wrong_class_folder(raw_dir):
@@ -158,10 +159,10 @@ def test_build_dataset_rejects_missing_classes(tmp_path):
 # ---------- sauvegarde / rechargement ----------
 @pytest.mark.parametrize("mmap", [False, True])
 def test_save_then_load_roundtrip(raw_dir, tmp_path, mmap):
-    X, y, paths = pp.build_dataset(raw_dir)
-    pp.save_dataset(X, y, paths, tmp_path / "cache")
-    X2, y2, p2 = pp.load_dataset(tmp_path / "cache", mmap=mmap)
-    assert np.array_equal(X, X2) and np.array_equal(y, y2) and np.array_equal(paths, p2)
+    x, y, paths = pp.build_dataset(raw_dir)
+    pp.save_dataset(x, y, paths, tmp_path / "cache")
+    x2, y2, p2 = ds.load_dataset(tmp_path / "cache", mmap=mmap)
+    assert np.array_equal(x, x2) and np.array_equal(y, y2) and np.array_equal(paths, p2)
 
 
 # ---------- encodage des labels ----------

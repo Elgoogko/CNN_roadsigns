@@ -1,7 +1,5 @@
 import os
-from pathlib import Path
 import numpy as np
-import pytest
 from trafficsigns.training.train import train_model
 
 def test_train_model_execution(tmp_path):

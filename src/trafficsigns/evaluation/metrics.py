@@ -26,7 +26,7 @@ def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
     image_paths = df['Path'].values
     
     print("--- 3. Prétraitement des images de test ---")
-    X_test = []
+    x_test = []
     
     for img_path in image_paths:
         full_path = Path(base_img_dir) / img_path
@@ -36,13 +36,13 @@ def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
             continue
             
         img_processed = preprocess_single_image(full_path, mean=1.0, std=1.0)
-        X_test.append(img_processed)
+        x_test.append(img_processed)
         
-    X_test = np.array(X_test)
-    print(f"Tenseur de test créé avec succès : {X_test.shape}")
+    x_test = np.array(x_test)
+    print(f"Tenseur de test créé avec succès : {x_test.shape}")
     
     print("\n--- 4. Génération des prédictions ---")
-    y_pred_probs = model.predict(X_test)
+    y_pred_probs = model.predict(x_test)
     y_pred = np.argmax(y_pred_probs, axis=1)
     
     print("\n--- 5. Résultats et Métriques ---")
