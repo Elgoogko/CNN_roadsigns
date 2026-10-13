@@ -10,7 +10,6 @@ image:
 
 dataset:
   num_classes: 43
-  batch_size: 32
   extensions: [".png"]
 
 input_data:
@@ -18,3 +17,12 @@ input_data:
 
 split:
   val_ratio: 0.2
+
+model:
+  name: "CNN"
+
+train:
+  model_output_dir: models/CNN
+  data_dir: data/processed
+  epochs: 15
+  batch_size: 32
