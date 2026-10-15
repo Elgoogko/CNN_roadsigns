@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense,
 
 def build_cnn_model(input_shape: tuple[int, int, int], num_classes: int) -> tf.keras.Model:
     """
-    Construit un réseau de neurones convolutif (CNN) pour la classification 
+    Construit un réseau de neurones convolutif (cnn) pour la classification
     de panneaux de signalisation.
     
     Args:

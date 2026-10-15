@@ -2,7 +2,9 @@ seed: 42
 data:
   kaggle_handle: meowmeowmeowmeowmeow/gtsrb-german-traffic-sign
   raw_dir: data/raw/gtsrb
+  processed_dir: data/processed/train   # NEW (dossier utilisé pour mean/std)
   train_csv: Train.csv
+  test_csv: Test.csv
 
 image:
   size: [48, 48]
@@ -10,19 +12,22 @@ image:
 
 dataset:
   num_classes: 43
+  batch_size: 32
   extensions: [".png"]
 
+# Données traitées, prêtes à être utilisées pour l'entraînement du modèle
 input_data:
-  processed_dir : data/processed/output_images.npz
+  processed_dir : data/processed/train/output_images.npz
+
+# Modèle
+model:
+  type: "cnn"
+  dir: models                           # NEW (modèle = models/<type>/model.keras)
 
 split:
   val_ratio: 0.2
 
-model:
-  type: "cnn"
-
-train:
-  model_dir: models/test
-  data_dir: data/processed/train
-  epochs: 15
-  batch_size: 32
+# Configuration du rapports et des plots de résultats
+reports:
+  result_dir: reports/model_metrics
+  save_plots: True

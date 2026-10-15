@@ -10,7 +10,7 @@ import yaml
 
 MODEL_REGISTRY = {
     "baseline" : build_baseline_model,
-    "CNN" : build_cnn_model
+    "cnn" : build_cnn_model
 }
 ROOT = Path(__file__).resolve().parents[2]
 Config = dict[str, Any]
