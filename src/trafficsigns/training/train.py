@@ -5,6 +5,7 @@ from trafficsigns.utils.compute_parameters import get_mean_std
 from trafficsigns.data.dataset import load_dataset, load_split
 from pathlib import Path
 import numpy as np
+import pandas as pd
 
 def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: int, model_to_train: str):
     """
@@ -42,6 +43,11 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
 
     print(f"\n--- 5. Sauvegarde du modèle ---")
     Path.mkdir(Path(model_save_path), exist_ok=True)
+
+    df_history = pd.DataFrame(history.history)
+    df_history.index.name = "epoch"
+    df_history.to_csv(model_save_path / "history_epochs.csv")
+    print(f"Historique par époque sauvegardé dans {model_save_path / 'history_epochs.csv'}")
 
     model.save(Path.joinpath(Path(model_save_path), "model.keras"))
     np.savez(Path.joinpath(Path(model_save_path), "norm_stats.npz"), mean=mean, std=std) #Sert lors de l'inférence
