@@ -22,7 +22,7 @@ input_data:
 
 # Modèle
 model:
-  name: "base_model"
+  name: "cnn"
   type: "cnn"
   dir: models/cnn                           #
 

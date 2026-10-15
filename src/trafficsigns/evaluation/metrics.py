@@ -57,8 +57,9 @@ def save_confusion_matrix_plot(
 
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
-    plt.close()
+    plt.show()
     print(f"Graphique de la matrice de confusion sauvegardé dans {out_path}")
+    plt.close()
 
 def save_misclassified_chart(
     misclassified_df: pd.DataFrame,
@@ -128,7 +129,15 @@ def save_misclassified_chart(
 
 def evaluate_model(model_path: Path, test_csv: Path, img_dir: Path,
                    train_dir: Path, out_dir: Path) -> None:
-    """Évalue un modèle Keras sur le jeu de test et sauvegarde la matrice de confusion."""
+    """
+    Évalue un modèle Keras sur le jeu de test et sauvegarde la matrice de confusion.
+    :param model_path: Lien vers le modèle Keras
+    :param test_csv: Chemin vers le fichier CSV contenant les données de test
+    :param img_dir: Chemin vers le répertoire contenant les images de test
+    :param train_dir: Chemin vers le répertoire contenant les images d'entraînement
+    :param out_dir: Chemin vers le répertoire de sortie pour les graphiques
+    :return:
+    """
     print(f"--- Modèle : {model_path}")
     model = tf.keras.models.load_model(model_path)
 
