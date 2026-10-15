@@ -1,4 +1,3 @@
-import os
 import argparse
 from trafficsigns.data.preprocessing import normalize, NUM_CLASSES
 from trafficsigns.config import load_config, ROOT, MODEL_REGISTRY

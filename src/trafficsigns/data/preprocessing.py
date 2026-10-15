@@ -6,7 +6,7 @@ Deux étapes distinctes :
   2. normalize : uint8 -> float32 [0, 1], appliquée à chaque lot au chargement
 """
 from pathlib import Path
-
+from tqdm import tqdm
 import cv2
 import numpy as np
 from trafficsigns.config import load_config
@@ -123,10 +123,12 @@ def build_dataset(raw_dir: str | Path, size: tuple[int, int] = IMG_SIZE):
     )
 
     images, labels, paths = [], [], []
+    print("== Construction du dataset ==")
+    progress_bar = tqdm(total=len(class_dirs))
+    
     for cls_dir in class_dirs:
         label = int(cls_dir.name)
         files = sorted(f for f in cls_dir.iterdir() if f.suffix.lower() in IMG_EXTENSIONS)
-        print(f"Classe {label} : {len(files)} images")
 
         for f in files:
             if int(f.name.split("_")[0]) != label:
@@ -134,7 +136,8 @@ def build_dataset(raw_dir: str | Path, size: tuple[int, int] = IMG_SIZE):
             images.append(load_and_resize(f, size))
             labels.append(label)
             paths.append(f.relative_to(raw_dir).as_posix())
-
+            
+        progress_bar.update(1)
     y = np.array(labels, dtype=np.int64)
     if set(y.tolist()) != set(range(NUM_CLASSES)):
         raise ValueError(f"Classes trouvées inattendues : {sorted(set(y.tolist()))}")
@@ -177,7 +180,28 @@ def from_one_hot(y_one_hot: np.ndarray) -> np.ndarray:
     :return: matrice de taille (N, num_classes) représentant les classes prédites
     """
     return np.argmax(y_one_hot, axis=-1)
-
+"""
 if __name__ == "__main__":
     img_X, img_y, img_paths = build_dataset(ROOT / "data" / "raw" / "gtsrb" / "Train")
     save_dataset(img_X, img_y, img_paths, ROOT / "data" / "processed" / "train")
+    """
+
+if __name__ == "__main__":
+    from trafficsigns.config import ROOT
+    from trafficsigns.data.data_augmentation import balance_and_augment_dataset
+
+    raw_dir = ROOT / "data" / "raw" / "gtsrb" / "Train"
+    output_dir = ROOT / "data" / "processed" / "train_augmented"
+
+    # 1. Chargement/Build brut
+    X, y, paths = build_dataset(raw_dir)
+    print(f"Dataset brut : {X.shape[0]} images au total.")
+
+    # 2. Augmentation & Rééquilibrage (ex: 2000 images par classe = 86 000 images)
+    X_aug, y_aug, paths_aug = balance_and_augment_dataset(X, y, paths, target_per_class=2000)
+
+    # 3. Sauvegarde dans le dossier processed/train sous forme .npy
+    save_dataset(X_aug, y_aug, paths_aug, output_dir)
+    print(f"Dataset augmenté sauvegardé sous '{output_dir}'.")
+    print(f"x_augmented shape: {X_aug.shape}")
+    print(f"y_augmented shape: {y_aug.shape}")

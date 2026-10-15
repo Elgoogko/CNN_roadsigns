@@ -20,11 +20,13 @@ class Inference:
         """Effectue une passe avant sur un tensor (N, H, W, C)."""
         return self.model.predict(input_tensor, verbose=0)
 
-    def apply_argmax(self, output_tensor: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def apply_argmax(output_tensor: np.ndarray) -> np.ndarray:
         """Convertit les probabilités softmax en indices de classes."""
         return np.argmax(output_tensor, axis=-1)
 
-    def confidence(self, predictions: np.ndarray, predicted_classes: np.ndarray,
+    @staticmethod
+    def confidence(predictions: np.ndarray, predicted_classes: np.ndarray,
                    img_id: int | None = None) -> float | np.ndarray:
         """
         Calcule la confiance de la classe prédite.
