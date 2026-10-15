@@ -5,6 +5,7 @@ data:
   processed_dir: data/processed/train   # NEW (dossier utilisé pour mean/std)
   train_csv: Train.csv
   test_csv: Test.csv
+  epochs: 10
 
 image:
   size: [48, 48]
@@ -22,9 +23,9 @@ input_data:
 
 # Modèle
 model:
-  name: "cnn"
-  type: "cnn"
-  dir: models/cnn                           #
+  name: "baseline_MLP"
+  type: "baseline"
+  dir: models/baseline                           #
 
 split:
   val_ratio: 0.2
