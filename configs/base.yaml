@@ -14,6 +14,7 @@ dataset:
   num_classes: 43
   batch_size: 32
   extensions: [".png"]
+  target_per_class: 2000  # Nombre d'images par classe après augmentation
 
 # Données traitées, prêtes à être utilisées pour l'entraînement du modèle
 input_data:
@@ -21,8 +22,9 @@ input_data:
 
 # Modèle
 model:
+  name: "base_model"
   type: "cnn"
-  dir: models                           # NEW (modèle = models/<type>/model.keras)
+  dir: models/cnn                           #
 
 split:
   val_ratio: 0.2
