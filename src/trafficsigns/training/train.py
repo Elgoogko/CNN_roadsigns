@@ -1,16 +1,18 @@
 import os
 import argparse
 from trafficsigns.data.preprocessing import normalize, NUM_CLASSES
-from trafficsigns.models.baseline import build_baseline_model
+from trafficsigns.config import load_config, ROOT, MODEL_REGISTRY
 from trafficsigns.utils.compute_parameters import get_mean_std
 from trafficsigns.data.dataset import load_dataset, load_split
 from pathlib import Path
 import numpy as np
 
-def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: int):
+def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: int, model_to_train: str):
     """
     Charge les données, normalise, entraîne le modèle et sauvegarde les poids.
     """
+    assert model_to_train in MODEL_REGISTRY.keys()
+
     print(f"--- 1. Chargement des données depuis le dossier {data_dir} ---")
     x, y, _ = load_dataset(data_dir, mmap=True)
     train_idx, val_idx = load_split(data_dir)
@@ -27,7 +29,7 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     input_shape = x_train.shape[1:]
     num_classes = NUM_CLASSES
     
-    model = build_baseline_model(input_shape=input_shape, num_classes=num_classes)
+    model = MODEL_REGISTRY[model_to_train](input_shape=input_shape, num_classes=num_classes)
     model.summary()
 
     print("\n--- 4. Début de l'entraînement ---")
@@ -40,25 +42,38 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     )
 
     print(f"\n--- 5. Sauvegarde du modèle ---")
-    os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
-    model.save(model_save_path)
+    Path.mkdir(Path(model_save_path), exist_ok=True)
+
+    model.save(Path.joinpath(Path(model_save_path), "model.keras"))
+    np.savez(Path.joinpath(Path(model_save_path), "norm_stats.npz"), mean=mean, std=std) #Sert lors de l'inférence
+
     print(f"Modèle sauvegardé avec succès sous : {model_save_path}")
-    save_path = Path(model_save_path)
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(save_path.parent / "norm_stats.npz", mean=mean, std=std)  # pour l'inférence
 
     return history
 
 if __name__ == "__main__":
+
+    cfg_path = Path.joinpath(ROOT, "configs", "base.yaml")
+    cfg = load_config(cfg_path) if cfg_path.exists() else {}
+
+    # Extraire les sous-sections du YAML avec valeurs de secours (fallbacks)
+    train_cfg = cfg.get("train", {})
+    model_cfg = cfg.get("model", {})
+
+    # Configurer le parser avec les valeurs du YAML comme 'default'
     parser = argparse.ArgumentParser(description="Script d'entraînement du modèle")
-    parser.add_argument("--data_dir", type=str, default="data/processed/train", help="Dossier contenant img_mats, labels et split")
-    parser.add_argument("--model_out", type=str, default="models/baseline_model.keras", help="Chemin de sauvegarde du modèle")
-    parser.add_argument("--epochs", type=int, default=15, help="Nombre d'époques d'entraînement")
-    parser.add_argument("--batch_size", type=int, default=32, help="Taille du batch")
-    
+    parser.add_argument("--model", type=str, default=model_cfg.get("type", "baseline"), help="Modèle à entraîner")
+    parser.add_argument("--data_dir", type=str, default=train_cfg.get("data_dir", "data/processed/train"),
+                        help="Dossier des données")
+    parser.add_argument("--model_out", type=str, default=train_cfg.get("model_dir", "models/new_model"),
+                        help="Chemin de sauvegarde")
+    parser.add_argument("--epochs", type=int, default=train_cfg.get("epochs", 15), help="Nombre d'époques")
+    parser.add_argument("--batch_size", type=int, default=train_cfg.get("batch_size", 32), help="Taille de batch")
+
     args = parser.parse_args()
-    
+
     train_model(
+        model_to_train=args.model,
         data_dir=args.data_dir,
         model_save_path=args.model_out,
         epochs=args.epochs,

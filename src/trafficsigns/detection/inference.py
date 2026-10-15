@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # Test de démonstration
     from trafficsigns.config import ROOT  # Import de ROOT selon ta structure
 
-    mdl_path = ROOT / "models" / "baseline" / "MLP_v1.keras"
+    mdl_path = ROOT / "models" / "baseline" / "model.keras"
     stats_path = ROOT / "models" / "baseline" / "norm_stats.npz"
 
     engine = Inference(model_path=mdl_path, norm_stats_path=stats_path)
