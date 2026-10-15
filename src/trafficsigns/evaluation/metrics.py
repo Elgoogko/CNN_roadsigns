@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-from trafficsigns.utils.compute_parameters import get_mean_std
+from trafficsigns.utils.compute_parameters import get_mean_std, load_mean_std
 
 from trafficsigns.data.preprocessing import preprocess_single_image
 
-def evaluate_model(model_path: str, test_csv_path: str, data_dir: str, base_img_dir: str):
+def evaluate_model(model_path: str, test_csv_path: str, base_img_dir: str):
     """
     Évalue un modèle Keras sur le jeu de test complet et affiche les métriques.
     :param model_path: Le chemin vers le fichier du modèle entraîné (ex: '.keras').
@@ -37,8 +37,8 @@ def evaluate_model(model_path: str, test_csv_path: str, data_dir: str, base_img_
             print(f"Image introuvable ignorée : {full_path}")
             continue
 
-        mean, std = get_mean_std(data_dir)
-        img_processed = preprocess_single_image(full_path, mean, std)
+        mean, std = load_mean_std(Path.joinpath(Path(model_path).resolve().parent, "norm_stats.npz"))
+        img_processed = preprocess_single_image(img_path=full_path, mean=mean, std=std)
         X_test.append(img_processed)
         
     X_test = np.array(X_test)
@@ -64,15 +64,13 @@ def evaluate_model(model_path: str, test_csv_path: str, data_dir: str, base_img_
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script d'évaluation du modèle")
-    parser.add_argument("--model", type=str, required=True, help="Chemin vers le modèle entraîné (.keras)")
+    parser.add_argument("--model_dir", type=str, required=True, help="Chemin vers le modèle entraîné le dossier contenant le modèle et le fichier norm_stats.npz")
     parser.add_argument("--csv", type=str, default="data/raw/gtsrb/Test.csv", help="Chemin vers le CSV de test")
-    parser.add_argument("--data_dir", type=str, default="data/processed/train", help="Dossier contenant les données d'entraînement pour la normalisation")
     parser.add_argument("--img_dir", type=str, default="data/raw/gtsrb/", help="Dossier racine des images de test")
     args = parser.parse_args()
     
     evaluate_model(
         model_path=args.model,
         test_csv_path=args.csv,
-        data_dir=args.data_dir,
         base_img_dir=args.img_dir
     )

@@ -42,57 +42,40 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     )
 
     print(f"\n--- 5. Sauvegarde du modèle ---")
-    os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
-    model.save(model_save_path)
+    Path.mkdir(Path(model_save_path), exist_ok=True)
+
+    model.save(Path.joinpath(Path(model_save_path), "model.keras"))
+    np.savez(Path.joinpath(Path(model_save_path), "norm_stats.npz"), mean=mean, std=std) #Sert lors de l'inférence
+
     print(f"Modèle sauvegardé avec succès sous : {model_save_path}")
-    save_path = Path(model_save_path)
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(save_path.parent / "norm_stats.npz", mean=mean, std=std)  # pour l'inférence
 
     return history
 
 if __name__ == "__main__":
 
-    CFG = load_config(Path.joinpath(ROOT, "configs","base.yaml"))
-    user_input = "n"
-    model_to_train = "baseline"
-    data_dir = "data/processed/train"
-    model_out = "models/new_model.keras"
-    epochs = 15
-    batch_size = 32
+    cfg_path = Path.joinpath(ROOT, "configs", "base.yaml")
+    cfg = load_config(cfg_path) if cfg_path.exists() else {}
 
-    if CFG["train"]:
-        while user_input not in ["n", "y"]:
-            print("Configuration trouvé ! Utilisé les configurations de base ? [y/N]")
-            user_input = input().lower()
+    # Extraire les sous-sections du YAML avec valeurs de secours (fallbacks)
+    train_cfg = cfg.get("train", {})
+    model_cfg = cfg.get("model", {})
 
-    if user_input == "y":
-        keys = CFG["data_dir"].keys()
-        assert CFG["model"]["name"]
+    # Configurer le parser avec les valeurs du YAML comme 'default'
+    parser = argparse.ArgumentParser(description="Script d'entraînement du modèle")
+    parser.add_argument("--model", type=str, default=model_cfg.get("type", "baseline"), help="Modèle à entraîner")
+    parser.add_argument("--data_dir", type=str, default=train_cfg.get("data_dir", "data/processed/train"),
+                        help="Dossier des données")
+    parser.add_argument("--model_out", type=str, default=train_cfg.get("model_dir", "models/new_model"),
+                        help="Chemin de sauvegarde")
+    parser.add_argument("--epochs", type=int, default=train_cfg.get("epochs", 15), help="Nombre d'époques")
+    parser.add_argument("--batch_size", type=int, default=train_cfg.get("batch_size", 32), help="Taille de batch")
 
-        model_to_train = CFG["model"]["name"]
-
-        if "data_dir" in keys:
-            data_dir = CFG["train"]["data_dir"]
-        if "model_out" in keys:
-            model_out = CFG["train"]["model_out"]
-        if "epochs" in keys:
-            epochs = CFG["train"]["epochs"]
-        if batch_size in keys:
-            batch_size = CFG["train"]["batch_size"]
-    else:
-        parser = argparse.ArgumentParser(description="Script d'entraînement du modèle")
-        parser.add_argument("--data_dir", type=str, default=data_dir, help="Dossier contenant img_mats, labels et split")
-        parser.add_argument("--model_out", type=str, default=model_out, help="Chemin de sauvegarde du modèle")
-        parser.add_argument("--epochs", type=int, default=epochs, help="Nombre d'époques d'entraînement")
-        parser.add_argument("--batch_size", type=int, default=batch_size, help="Taille du batch")
-
-        args = parser.parse_args()
+    args = parser.parse_args()
 
     train_model(
-        data_dir=data_dir,
-        model_save_path=model_out,
-        epochs=epochs,
-        batch_size=batch_size,
-        model_to_train=model_to_train
+        model_to_train=args.model,
+        data_dir=args.data_dir,
+        model_save_path=args.model_out,
+        epochs=args.epochs,
+        batch_size=args.batch_size
     )
