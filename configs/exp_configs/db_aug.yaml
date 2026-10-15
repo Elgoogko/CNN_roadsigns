@@ -5,6 +5,7 @@ data:
   processed_dir: data/processed/train_augmented
   train_csv: Train.csv
   test_csv: Test.csv
+  epochs: 10
 
 image:
   size: [43, 43]
