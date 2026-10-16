@@ -1,7 +1,7 @@
 seed: 42
 data:
   kaggle_handle: meowmeowmeowmeowmeow/gtsrb-german-traffic-sign
-  raw_dir: data/raw/gtsrb/Train
+  raw_dir: data/raw/gtsrb
   processed_dir: data/processed/train_augmented
   train_csv: Train.csv
   test_csv: Test.csv
@@ -25,7 +25,7 @@ input_data:
 model:
   name: "db_aug"
   type: "cnn"
-  dir: models/experience/db_aug
+  dir: models/experiences/db_aug
 
 split:
   val_ratio: 0.2
