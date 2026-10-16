@@ -5,10 +5,10 @@ data:
   processed_dir: data/processed/train   # NEW (dossier utilisé pour mean/std)
   train_csv: Train.csv
   test_csv: Test.csv
-  epochs: 10
+  epochs: 8
 
 image:
-  size: [43, 43]
+  size: [48, 48]
   channels: 3
 
 dataset:

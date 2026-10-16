@@ -8,8 +8,7 @@ requires-python = ">=3.11"
 dependencies = [
     "ipykernel>=7.4.0",
     "kagglehub>=1.0.2",
-    "keras>=3.15.1",
-    "keras-nightly>=3.16.0.dev2026101004",
+    "keras>=3.10",
     "matplotlib>=3.11.2",
     "nbstripout>=0.9.1",
     "numpy>=2.4.6",

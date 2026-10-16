@@ -5,10 +5,10 @@ data:
   processed_dir: data/processed/train   # NEW (dossier utilisé pour mean/std)
   train_csv: Train.csv
   test_csv: Test.csv
-  epochs: 10
+  epochs: 8
 
 image:
-  size: [43, 43]
+  size: [48, 48]
   channels: 3
 
 dataset:
@@ -25,12 +25,12 @@ input_data:
 model:
   name: "cnn_second"
   type: "cnn_second"
-  dir: models/experience/cnn_second                           #
+  dir: models/experiences/cnn_second                           #
 
 split:
   val_ratio: 0.2
 
 # Configuration du rapports et des plots de résultats
 reports:
-  result_dir: reports/model_metrics
+  result_dir: reports/model_metrics/experiences
   save_plots: True

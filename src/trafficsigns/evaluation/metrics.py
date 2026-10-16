@@ -147,9 +147,12 @@ def evaluate_model(model_path: Path, test_csv: Path, img_dir: Path,
         print(f"{(~exists).sum()} image(s) introuvable(s), ignorée(s)")
     df = df[exists]  # garde y_true aligné avec X_test
 
+    _, h, w, _ = model.input_shape
+    size = (w, h)  # cv2.resize attend (largeur, hauteur)
+
     mean, std = get_mean_std(train_dir)
-    X_test = np.array([preprocess_single_image(img_dir / p, mean=mean, std=std) for p in df["Path"]])
-    X_raw = [load_and_resize(img_dir / p) for p in df["Path"]]
+    X_test = np.array([preprocess_single_image(img_dir / p,size=size, mean=mean, std=std) for p in df["Path"]])
+    X_raw = [load_and_resize(img_dir / p, size=size) for p in df["Path"]]
     y_true = df["ClassId"].values
     print(f"Tenseur de test : {X_test.shape}")
 

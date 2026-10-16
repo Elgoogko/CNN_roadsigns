@@ -42,10 +42,17 @@ def train_model(data_dir: str, model_save_path: str, epochs: int, batch_size: in
     )
 
     print(f"\n--- 5. Sauvegarde du modèle ---")
-    Path.mkdir(Path(model_save_path), exist_ok=True)
 
     df_history = pd.DataFrame(history.history)
     df_history.index.name = "epoch"
+
+    df_history.to_csv(ROOT / "failsafe" / "history_epochs.csv")
+
+    model.save(Path.joinpath(ROOT, "failsafe", "model.keras"))
+    np.savez(Path.joinpath(ROOT, "failsafe", "norm_stats.npz"), mean=mean, std=std) #Sert lors de l'inférence
+
+    Path.mkdir(Path(model_save_path), exist_ok=True)
+
     df_history.to_csv(model_save_path / "history_epochs.csv")
     print(f"Historique par époque sauvegardé dans {model_save_path / 'history_epochs.csv'}")
 

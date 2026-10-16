@@ -205,5 +205,5 @@ out/
 .idea/uiDesigner.xml
 .idea/inspectionProfiles/
 data/
-figures/
 models/
+reports/detailed_classes

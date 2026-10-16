@@ -131,6 +131,7 @@ def build_dataset(raw_dir: str | Path, size: tuple[int, int] = IMG_SIZE):
         files = sorted(f for f in cls_dir.iterdir() if f.suffix.lower() in IMG_EXTENSIONS)
 
         for f in files:
+
             if int(f.name.split("_")[0]) != label:
                 raise ValueError(f"Fichier {f} rangé dans la mauvaise classe")
             images.append(load_and_resize(f, size))

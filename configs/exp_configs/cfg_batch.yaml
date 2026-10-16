@@ -5,10 +5,10 @@ data:
   processed_dir: data/processed/train
   train_csv: Train.csv
   test_csv: Test.csv
-  epochs: 10
+  epochs: 8
 
 image:
-  size: [43, 43]
+  size: [48,48]
   channels: 3
 
 dataset:
@@ -25,7 +25,7 @@ input_data:
 model:
   name: "batch_size"
   type: "cnn"
-  dir: models/experience/batch_size
+  dir: models/experiences/batch_size
 
 split:
   val_ratio: 0.2
